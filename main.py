@@ -1,6 +1,7 @@
 import time
 import sys
 import random
+import items
 
 def print_logo():
     print("""
@@ -54,6 +55,12 @@ def game_loop():
     #tutorial
     typing_effect("Now the tutorial begins!", 0.05)
     tutorial(player)
+    typing_effect("The tutorial is over!", 0.05)
+    typing_effect("...", 0.4)
+
+    player.set_current_location(Location("town", player))
+    typing_effect("You have entered " + player.currentLocation + "!", 0.05)
+
 
 #tutorial function
 def tutorial(player):
@@ -72,6 +79,20 @@ def tutorial(player):
     typing_effect("...", 0.4)
     print()
     random_enemy_cutseen(player)
+
+    typing_effect("Well done " + player.name + "! You just battled an enemy!", 0.05)
+    typing_effect("...", 0.4)
+    typing_effect("You can now continue on your journey!", 0.05)
+    typing_effect("...", 0.4)
+    print()
+
+    player.add_to_inventory(items.WoodenStick())
+    typing_effect("You have been given a new weapon!", 0.05)
+    typing_effect("...", 0.4)
+    typing_effect("This will do more damage than using your fists!", 0.05)
+    typing_effect("It may be usefull later on to defeat enemies!", 0.05)
+    typing_effect("...", 0.4)
+    print()
     
 #random enemy generator
 def random_enemy_cutseen(player):
@@ -134,6 +155,9 @@ class Player():
     def __init__(self, name, health):
         self.name = name
         self.health = health
+        self.currentLocation = None
+
+        #inventory
         self.inventory = []
 
     def attack_enemy(self, enemy):
@@ -141,10 +165,20 @@ class Player():
         enemy.health -= damage
         return damage
 
+    def set_current_location(self, location):
+        self.currentLocation = location
+
     def death(self):
         print("You have died!")
         time.sleep(1)
-        exit()    
+        exit()
+
+    def add_to_inventory(self, item):
+        typing_effect("You have picked up a " + item.name + "!", 0.05)
+        self.inventory.append(item)
+
+    def remove_from_inventory(self, item):
+        self.inventory.remove(item)    
 
 
 #enemy class
@@ -173,7 +207,21 @@ class Enemy():
         return damage
 
     def get_random_taunt_response(self):
-        return random.choice(self.tauntResponses)    
+        return random.choice(self.tauntResponses)
+
+class Location():
+    locations = ['forest', 'cave', 'mountain', 'desert', 'town', 'beach']
+
+    def __init__(self, locationName, player):
+        self.locationName = locationName
+        self.player = player
+
+        self.location = self.get_location_from_list(locationName)
+
+    def get_location_from_list(self, locationName):
+        for location in self.locations:
+            if location == locationName:
+                return location
 
 
 #run code :3
